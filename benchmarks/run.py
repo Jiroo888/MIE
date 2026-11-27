@@ -39,6 +39,10 @@ def main():
             result = search(root, query, budget=2000)
             elapsed = (time.perf_counter() - started) * 1000
             baseline = result["stats"]["scanned_chars"]
+            if not baseline:
+                print(json.dumps({"error": "Benchmark scanned no source text.", "stats": result["stats"],
+                                  "warnings": result["warnings"], "root": str(root)}, indent=2), file=sys.stderr)
+                return 1
             covered = any(s["path"] == expected_path for s in result["snippets"]) and expected_line in result["context"]
             rows.append({
                 "query": query, "expected_path": expected_path, "covered": covered,

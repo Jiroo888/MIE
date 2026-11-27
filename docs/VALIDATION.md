@@ -6,7 +6,7 @@ Validated on Windows with Python 3.14.7 on November 27, 2026.
 | --- | --- |
 | Build and install in an isolated virtual environment | Passed |
 | Installed `mie --version` command | `0.1.0` |
-| CLI integration suite | 13 passed, 1 skipped |
+| CLI and benchmark integration suite | 15 passed, 1 skipped |
 | UTF-8 output through CP1252-configured pipes | Passed |
 | Budget clipping retains matches after long context, within long lines, and after expanding Unicode casefold characters | Passed |
 | Synthetic retrieval benchmark | 3/3 labeled targets present |

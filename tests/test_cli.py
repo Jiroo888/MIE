@@ -145,6 +145,24 @@ class CliTests(unittest.TestCase):
         self.assertIn("needle", result["context"])
         self.assertLessEqual(len(result["context"]), 512)
 
+    @unittest.skipUnless(shutil.which("git"), "Git is required by the benchmark")
+    def test_benchmark_runs_from_a_relative_temporary_directory(self):
+        env = dict(os.environ, TMPDIR=".", TEMP=".", TMP=".")
+        result = subprocess.run([sys.executable, str(PROJECT / "benchmarks" / "run.py")],
+                                cwd=self.root, env=env, capture_output=True, text=True, encoding="utf-8")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(json.loads(result.stdout)["coverage"], "3/3")
+
+    def test_search_resolves_relative_roots_for_benchmark_callers(self):
+        self.write("app.py", "needle = 1\n")
+        env = dict(os.environ, PYTHONPATH=str(PROJECT / "src"))
+        result = subprocess.run(
+            [sys.executable, "-c", "from pathlib import Path; from mie.cli import search; import json; print(json.dumps(search(Path('.'), 'needle')))"],
+            cwd=self.root, env=env, capture_output=True, text=True, encoding="utf-8",
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("needle = 1", json.loads(result.stdout)["context"])
+
 
 if __name__ == "__main__":
     unittest.main()

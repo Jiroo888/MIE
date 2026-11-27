@@ -95,6 +95,9 @@ def _display(value):
 
 def search(root, query, budget=12000, radius=3):
     """Select literal-term excerpts; budget applies to the context string only."""
+    root = Path(root).resolve(strict=True)
+    if not root.is_dir():
+        raise ValueError("Root must be a directory.")
     terms = sorted(set(re.findall(r"[^\W_]+", query.casefold(), re.UNICODE)))
     if not terms:
         raise ValueError("Query must contain at least one letter or number.")
@@ -231,10 +234,7 @@ def main(argv=None):
     command.add_argument("--format", choices=("text", "json"), default="text")
     args = parser.parse_args(argv)
     try:
-        root = args.root.resolve(strict=True)
-        if not root.is_dir():
-            raise ValueError("Root must be a directory.")
-        result = search(root, args.query, args.budget, args.radius)
+        result = search(args.root, args.query, args.budget, args.radius)
     except (OSError, ValueError) as error:
         parser.error(str(error))
     if args.format == "json":
